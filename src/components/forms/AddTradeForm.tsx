@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, TrendingDown, Info } from "lucide-react";
 import { calculatePnL } from "@/lib/calculations";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
 
 const formSchema = z.object({
   date: z.string(),
@@ -92,7 +93,7 @@ export function AddTradeForm() {
   };
 
   const onSubmit = (data: FormValues) => {
-    const tradeId = Math.random().toString(36).substring(7);
+    const tradeId = uuidv4();
     addTrade({
       ...data,
       id: tradeId,

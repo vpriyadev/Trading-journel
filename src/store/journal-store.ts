@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { JournalEntry } from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
 interface JournalState {
   entries: JournalEntry[];

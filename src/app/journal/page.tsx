@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { v4 as uuidv4 } from "uuid";
 
 const moods = [
   { value: "great", label: "Great", icon: Sparkles, color: "text-emerald-400", bg: "bg-emerald-400/10" },
@@ -39,7 +40,7 @@ export default function JournalPage() {
 
   const handleSave = () => {
     if (!title || !notes) return;
-    const id = Math.random().toString(36).substring(7);
+    const id = uuidv4();
     addEntry({
       id,
       title,
