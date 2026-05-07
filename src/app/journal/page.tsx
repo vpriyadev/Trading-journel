@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Plus, BookOpen, Check, ChevronDown, Smile, Meh, Frown, AlertCircle, Sparkles, Trash2 } from "lucide-react";
+import { BookOpen, Check, ChevronDown, Smile, Meh, Frown, AlertCircle, Sparkles, Trash2, PenTool } from "lucide-react";
 import { useJournalStore } from "@/store/journal-store";
 import {
   DropdownMenu,
@@ -57,52 +57,57 @@ export default function JournalPage() {
   if (!mounted) return null;
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-1000 max-w-4xl mx-auto pb-20">
-      <div className="flex items-end justify-between border-b border-white/5 pb-8">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight text-white">Journal</h1>
-          <p className="text-sm text-slate-500 mt-2 font-medium">Daily reflections and market psychology logs.</p>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-1000 max-w-4xl mx-auto pb-24">
+      <div className="flex items-end justify-between border-b border-white/[0.04] pb-8">
+        <div className="flex items-center gap-5">
+           <div className="h-14 w-14 rounded-3xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+              <PenTool className="h-6 w-6 text-slate-400" />
+           </div>
+           <div>
+              <h1 className="text-4xl font-bold tracking-tight text-white">Journal</h1>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Daily psychological audits and market reflections.</p>
+           </div>
         </div>
       </div>
 
-      <Card className="bg-white/[0.01] border-white/5 backdrop-blur-xl shadow-2xl p-8 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_240px] gap-8">
+      <Card className="bg-white/[0.01] border-white/[0.06] backdrop-blur-xl shadow-2xl p-10 space-y-10 rounded-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_240px] gap-10">
           <div className="space-y-3">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Entry Title</Label>
+            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 block mb-2">Reflective Title</Label>
             <Input
-              placeholder="e.g. Mid-week market review..."
-              className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-xl h-12"
+              placeholder="Mid-session emotional audit..."
+              className="bg-white/[0.02] border-white/[0.06] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-2xl h-12 text-sm font-medium"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           
           <div className="space-y-3">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Current Mood</Label>
+            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 block mb-2">Psychological State</Label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full h-12 justify-between bg-white/[0.02] border-white/5 rounded-xl hover:bg-white/[0.04] px-4 group">
+                <Button variant="outline" className="w-full h-12 justify-between bg-white/[0.02] border-white/[0.06] rounded-2xl hover:bg-white/[0.04] px-5 group transition-all">
                   <div className="flex items-center gap-3">
                     <div className={cn("p-1.5 rounded-lg", selectedMood.bg)}>
                       <selectedMood.icon className={cn("h-4 w-4", selectedMood.color)} />
                     </div>
-                    <span className="text-sm font-semibold text-slate-200">{selectedMood.label}</span>
+                    <span className="text-sm font-bold text-slate-200">{selectedMood.label}</span>
                   </div>
-                  <ChevronDown className="h-4 w-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
+                  <ChevronDown className="h-4 w-4 text-slate-600 group-hover:text-slate-300 transition-all duration-300" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[240px] bg-[#0b1120] border-white/10 rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-200">
+              <DropdownMenuContent align="end" className="w-[240px] bg-[#0b1120] border-white/[0.08] rounded-2xl shadow-2xl p-2 backdrop-blur-xl">
                 {moods.map((m) => (
                   <DropdownMenuItem
                     key={m.value}
                     onClick={() => setMood(m.value)}
-                    className="flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer focus:bg-white/[0.05] transition-colors group"
+                    className="flex items-center justify-between px-3 py-3 rounded-xl cursor-pointer focus:bg-white/[0.05] transition-all group mb-1 last:mb-0"
                   >
                     <div className="flex items-center gap-3">
-                       <div className={cn("p-1.5 rounded-lg transition-transform group-hover:scale-110", m.bg)}>
+                       <div className={cn("p-2 rounded-lg transition-transform duration-300 group-hover:scale-110", m.bg)}>
                           <m.icon className={cn("h-4 w-4", m.color)} />
                        </div>
-                       <span className="text-sm font-medium text-slate-300">{m.label}</span>
+                       <span className="text-[13px] font-bold text-slate-300 group-hover:text-white transition-colors">{m.label}</span>
                     </div>
                     {mood === m.value && <Check className="h-4 w-4 text-primary" />}
                   </DropdownMenuItem>
@@ -113,61 +118,82 @@ export default function JournalPage() {
         </div>
 
         <div className="space-y-3">
-          <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Daily Observations</Label>
+          <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 block mb-2">Market Observations & Sentiment</Label>
           <textarea
-            placeholder="Document your thoughts, emotions, and market conditions..."
-            className="flex min-h-[240px] w-full rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-4 text-sm placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 transition-all resize-none leading-relaxed"
+            placeholder="Document your thesis, emotional friction, and key learnings..."
+            className="flex min-h-[280px] w-full rounded-3xl border border-white/[0.06] bg-white/[0.02] px-6 py-6 text-sm placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/5 focus-visible:border-primary/40 transition-all resize-none leading-relaxed font-medium"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
         </div>
 
-        <div className="flex justify-end pt-4 border-t border-white/5">
+        <div className="flex justify-end pt-6 border-t border-white/[0.04]">
           <Button 
             onClick={handleSave} 
             disabled={!title || !notes}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-10 h-12 font-bold uppercase tracking-wider text-xs shadow-lg shadow-primary/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-12 h-12 font-bold uppercase tracking-[0.15em] text-[11px] shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             Archive Entry
           </Button>
         </div>
       </Card>
 
-      <div className="pt-8">
-        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-6 px-1">Past Reflections</h3>
-        {entries.length === 0 ? (
-          <Card className="bg-white/[0.01] border-white/5 p-16 flex flex-col items-center justify-center text-center rounded-3xl border-dashed">
-            <div className="h-16 w-16 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-center mb-6">
-              <BookOpen className="h-7 w-7 text-slate-600" />
-            </div>
-            <h4 className="text-lg font-bold text-white tracking-tight">No entries yet</h4>
-            <p className="text-sm text-slate-500 max-w-[240px] mt-2 font-medium leading-relaxed">
-              Start building your trading psychology database by recording your first entry.
-            </p>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {entries.map((entry) => (
-              <Card key={entry.id} className="bg-white/[0.01] border-white/5 p-6 backdrop-blur-xl group hover:bg-white/[0.02] transition-all">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                      <h4 className="text-lg font-bold text-white">{entry.title}</h4>
-                      <div className={cn("px-2 py-0.5 rounded-full text-[10px] font-bold uppercase", moods.find(m => m.value === entry.mood)?.bg, moods.find(m => m.value === entry.mood)?.color)}>
-                        {entry.mood}
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-slate-500 font-mono">{new Date(entry.date).toLocaleString()}</p>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => deleteEntry(entry.id)} className="text-slate-600 hover:text-rose-500 hover:bg-rose-500/10">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+      <div className="pt-12">
+        <div className="flex items-center gap-3 mb-8 px-2">
+           <BookOpen className="h-4 w-4 text-slate-500" />
+           <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Chronological Reflections</h3>
+        </div>
+        
+        <AnimatePresence mode="popLayout">
+          {entries.length === 0 ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <Card className="bg-white/[0.01] border-white/[0.06] p-20 flex flex-col items-center justify-center text-center rounded-[2.5rem] border-dashed">
+                <div className="h-16 w-16 rounded-[1.5rem] bg-white/[0.02] border border-white/[0.06] flex items-center justify-center mb-6">
+                  <Sparkles className="h-7 w-7 text-slate-700" />
                 </div>
-                <p className="mt-4 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">{entry.notes}</p>
+                <h4 className="text-xl font-bold text-white tracking-tight">Pristine Database</h4>
+                <p className="text-[13px] text-slate-500 max-w-[280px] mt-2 font-medium leading-relaxed">
+                  Your psychological audit trail begins here. Record your first reflection.
+                </p>
               </Card>
-            ))}
-          </div>
-        )}
+            </motion.div>
+          ) : (
+            <div className="space-y-6">
+              {entries.map((entry, i) => (
+                <motion.div 
+                  key={entry.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Card className="bg-white/[0.01] border-white/[0.06] p-8 backdrop-blur-xl group hover:bg-white/[0.02] transition-all rounded-3xl relative overflow-hidden">
+                    <div className="flex items-start justify-between relative z-10">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-4">
+                          <h4 className="text-xl font-bold text-white tracking-tight">{entry.title}</h4>
+                          <div className={cn("px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest", moods.find(m => m.value === entry.mood)?.bg, moods.find(m => m.value === entry.mood)?.color)}>
+                            {entry.mood}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <span className="h-1 w-1 rounded-full bg-primary/40" />
+                           <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider font-mono">{new Date(entry.date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => deleteEntry(entry.id)} className="text-slate-700 hover:text-rose-500 hover:bg-rose-500/10 transition-all rounded-xl opacity-0 group-hover:opacity-100">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="mt-6 text-sm text-slate-400 leading-relaxed font-medium whitespace-pre-wrap border-l-2 border-white/[0.03] pl-6">{entry.notes}</p>
+                    
+                    {/* Subtle Background Glow for Entry Card */}
+                    <div className={cn("absolute -right-20 -bottom-20 h-40 w-40 rounded-full blur-[80px] opacity-[0.02] transition-opacity group-hover:opacity-[0.04]", moods.find(m => m.value === entry.mood)?.bg)} />
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

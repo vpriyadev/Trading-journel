@@ -43,14 +43,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const MISTAKE_OPTIONS = [
-  "FOMO",
-  "Revenge Trading",
-  "Over-leveraged",
-  "Moved Stop Loss",
-  "Early Exit",
-  "Late Entry",
-  "No Plan",
+  "overtrading",
+  "early exit",
+  "no stop loss",
+  "moved stop",
+  "revenge trade",
+  "no plan",
 ];
+
+const STRATEGY_OPTIONS = ["breakout", "trend follow", "mean reversion", "scalp", "fvg gap"];
+const EMOTION_OPTIONS = ["calm", "confident", "anxious", "greedy", "fearful"];
 
 export function AddTradeForm() {
   const router = useRouter();
@@ -67,6 +69,8 @@ export function AddTradeForm() {
       entryPrice: 0,
       mistakes: [],
       notes: "",
+      strategy: "breakout",
+      emotion: "calm",
     },
   });
 
@@ -104,178 +108,178 @@ export function AddTradeForm() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-5xl mx-auto pb-20">
-        <div className="flex items-center justify-between border-b border-white/5 pb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">Record Execution</h2>
-            <p className="text-sm text-slate-500 font-medium mt-1">Local-first persistence enabled.</p>
-          </div>
-          <div className="flex items-center gap-3">
-             <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => form.reset()}
-                className="rounded-full border-white/5 bg-white/[0.02] text-slate-400 hover:text-white"
-             >
-               Reset
-             </Button>
-             <Button 
-                type="submit" 
-                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 font-bold uppercase tracking-wider text-xs"
-             >
-               Commit Trade
-             </Button>
-          </div>
-        </div>
+    <div className="w-full max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-white">Add Trade</h1>
+        <p className="text-sm text-slate-400">Log a position to track and learn from</p>
+      </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column: Core Data */}
-          <div className="space-y-8">
-            <div className="grid grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Execution Date</FormLabel>
-                    <FormControl>
-                      <Input type="datetime-local" {...field} className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-lg" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="asset"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Asset / Symbol</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. BTCUSDT" {...field} className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-lg" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 glass-morphism rounded-[2rem] p-10">
+          <div className="grid grid-cols-2 gap-x-12 gap-y-8">
+            {/* Row 1: Date & Asset */}
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Date & Time</FormLabel>
+                  <FormControl>
+                    <Input type="datetime-local" {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12 font-mono" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="asset"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Asset</FormLabel>
+                  <FormControl>
+                    <Input placeholder="AAPL, NQ, BTC..." {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
+            {/* Row 2: Side & Quantity */}
             <FormField
               control={form.control}
               name="side"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Direction</FormLabel>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Side</FormLabel>
                   <FormControl>
-                    <div className="flex p-1 bg-white/[0.03] border border-white/5 rounded-xl gap-1">
+                    <div className="flex bg-white/[0.02] border border-white/[0.08] rounded-xl p-1 gap-1">
                       <button
                         type="button"
                         onClick={() => field.onChange("Long")}
                         className={cn(
-                          "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all duration-300",
+                          "flex-1 py-2.5 rounded-lg text-xs font-bold transition-all duration-300",
                           field.value === "Long" 
-                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm" 
                             : "text-slate-500 hover:text-slate-300"
                         )}
                       >
-                        <TrendingUp className="h-3.5 w-3.5" />
-                        LONG
+                        Buy / Long
                       </button>
                       <button
                         type="button"
                         onClick={() => field.onChange("Short")}
                         className={cn(
-                          "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all duration-300",
+                          "flex-1 py-2.5 rounded-lg text-xs font-bold transition-all duration-300",
                           field.value === "Short" 
-                            ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" 
+                            ? "bg-rose-500/10 text-rose-500 border border-rose-500/20 shadow-sm" 
                             : "text-slate-500 hover:text-slate-300"
                         )}
                       >
-                        <TrendingDown className="h-3.5 w-3.5" />
-                        SHORT
+                        Sell / Short
                       </button>
                     </div>
                   </FormControl>
                 </FormItem>
               )}
             />
-
-            <div className="grid grid-cols-3 gap-6">
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Size</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-lg" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="entryPrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Entry</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-lg" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="exitPrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Exit</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-lg" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <AnimatePresence>
-              {calculatedPnl !== null && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className={cn(
-                    "p-6 rounded-2xl border flex items-center justify-between overflow-hidden relative",
-                    calculatedPnl >= 0 
-                      ? "bg-primary/5 border-primary/20" 
-                      : "bg-rose-500/5 border-rose-500/20"
-                  )}
-                >
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Expected Result</p>
-                    <h4 className={cn(
-                      "text-2xl font-bold font-mono mt-1",
-                      calculatedPnl >= 0 ? "text-primary" : "text-rose-500"
-                    )}>
-                      {calculatedPnl >= 0 ? "+" : ""}${calculatedPnl.toFixed(2)}
-                    </h4>
-                  </div>
-                  <div className={cn(
-                    "h-12 w-12 rounded-full flex items-center justify-center",
-                    calculatedPnl >= 0 ? "bg-primary/10 text-primary" : "bg-rose-500/10 text-rose-500"
-                  )}>
-                    {calculatedPnl >= 0 ? <TrendingUp className="h-6 w-6" /> : <TrendingDown className="h-6 w-6" />}
-                  </div>
-                </motion.div>
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Quantity</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12" />
+                  </FormControl>
+                </FormItem>
               )}
-            </AnimatePresence>
-          </div>
+            />
 
-          {/* Right Column: Qualitative Data */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Psychology & Execution Errors</Label>
-              <div className="flex flex-wrap gap-2">
+            {/* Row 3: Entry & Exit */}
+            <FormField
+              control={form.control}
+              name="entryPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Entry Price</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="exitPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Exit Price</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Row 4: SL & TP */}
+            <FormField
+              control={form.control}
+              name="stopLoss"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Stop Loss</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="takeProfit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Take Profit</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="any" {...field} className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-xl h-12" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Row 5: Strategy & Emotion */}
+            <FormField
+              control={form.control}
+              name="strategy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Strategy</FormLabel>
+                  <FormControl>
+                    <select {...field} className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl h-12 px-4 text-sm font-medium focus:ring-4 focus:ring-primary/5 outline-none appearance-none transition-all cursor-pointer">
+                      {STRATEGY_OPTIONS.map(s => <option key={s} value={s} className="bg-[#0b1120] uppercase">{s}</option>)}
+                    </select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="emotion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Emotion</FormLabel>
+                  <FormControl>
+                    <select {...field} className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl h-12 px-4 text-sm font-medium focus:ring-4 focus:ring-primary/5 outline-none appearance-none transition-all cursor-pointer">
+                      {EMOTION_OPTIONS.map(e => <option key={e} value={e} className="bg-[#0b1120] uppercase">{e}</option>)}
+                    </select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Row 6: Mistakes (Full Width) */}
+            <div className="col-span-2 space-y-4">
+              <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Mistakes (Optional)</Label>
+              <div className="flex flex-wrap gap-2.5">
                 {MISTAKE_OPTIONS.map((mistake) => {
                   const isSelected = values.mistakes.includes(mistake);
                   return (
@@ -284,10 +288,10 @@ export function AddTradeForm() {
                       type="button"
                       onClick={() => toggleMistake(mistake)}
                       className={cn(
-                        "px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 border",
+                        "px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 border",
                         isSelected
-                          ? "bg-primary/10 border-primary/30 text-primary shadow-sm shadow-primary/10"
-                          : "bg-white/[0.02] border-white/5 text-slate-500 hover:text-slate-300 hover:border-white/10"
+                          ? "bg-primary/10 border-primary/40 text-primary"
+                          : "bg-white/[0.02] border-white/[0.08] text-slate-500 hover:text-slate-300"
                       )}
                     >
                       {mistake}
@@ -297,32 +301,64 @@ export function AddTradeForm() {
               </div>
             </div>
 
+            {/* Row 7: Notes (Full Width) */}
             <FormField
               control={form.control}
               name="notes"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Reflection & Notes</FormLabel>
+                <FormItem className="col-span-2">
+                  <FormLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-2.5 block">Notes</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="What was the setup? Why did you enter? What did you learn?" 
-                      className="bg-white/[0.02] border-white/5 focus:border-primary/50 transition-all rounded-xl min-h-[160px] resize-none"
+                      placeholder="What happened? What did you learn?" 
+                      className="bg-white/[0.02] border-white/[0.08] focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all rounded-2xl min-h-[140px] resize-none leading-relaxed"
                       {...field} 
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+          </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex gap-3">
-              <Info className="h-5 w-5 text-slate-500 shrink-0" />
-              <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                Detailed reflections help build discipline. Your data stays locally on this device.
-              </p>
+          {/* Bottom Section: PNL, RR, Buttons */}
+          <div className="pt-10 mt-10 border-t border-white/[0.06] flex items-center justify-between">
+            <div className="flex gap-12">
+               <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 mb-2">PNL (Calculated)</p>
+                  <p className={cn(
+                    "text-lg font-bold font-mono tracking-tighter",
+                    calculatedPnl === null ? "text-slate-700" : (calculatedPnl >= 0 ? "text-emerald-400" : "text-rose-500")
+                  )}>
+                    {calculatedPnl === null ? "—" : `${calculatedPnl >= 0 ? "+" : ""}$${Math.abs(calculatedPnl).toFixed(2)}`}
+                  </p>
+               </div>
+               <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 mb-2">Risk : Reward</p>
+                  <p className="text-lg font-bold font-mono text-slate-400">
+                    —
+                  </p>
+               </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+               <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => router.push("/dashboard")}
+                  className="text-slate-400 hover:text-white hover:bg-white/[0.04] px-8"
+               >
+                 Cancel
+               </Button>
+               <Button 
+                  type="submit" 
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-10 h-11 font-bold uppercase tracking-wider text-xs shadow-lg shadow-primary/10"
+               >
+                 Save trade
+               </Button>
             </div>
           </div>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }

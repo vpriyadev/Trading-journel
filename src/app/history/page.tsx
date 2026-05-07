@@ -13,8 +13,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Trash2, Search, FileText } from "lucide-react";
+import { Download, Upload, Trash2, Search, FileText, Database, Layers } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export default function HistoryPage() {
   const { trades, deleteTrade, setTrades } = useTradeStore();
@@ -65,14 +66,13 @@ export default function HistoryPage() {
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
-        // Simple JSON import for now as it's more reliable for state
         const importedData = JSON.parse(text);
         if (Array.isArray(importedData)) {
           setTrades(importedData);
-          alert("Data imported successfully!");
+          alert("Data restored successfully!");
         }
       } catch (err) {
-        alert("Invalid file format. Please use a valid Ledger JSON export.");
+        alert("Invalid backup format.");
       }
     };
     reader.readAsText(file);
@@ -89,19 +89,24 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-1000 pb-20">
-      <div className="flex items-end justify-between border-b border-white/5 pb-8">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight text-white">History</h1>
-          <p className="text-sm text-slate-500 mt-2 font-medium">Review and manage your execution database.</p>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-1000 pb-24">
+      <div className="flex items-end justify-between border-b border-white/[0.04] pb-8">
+        <div className="flex items-center gap-5">
+           <div className="h-14 w-14 rounded-3xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+              <Database className="h-6 w-6 text-slate-400" />
+           </div>
+           <div>
+              <h1 className="text-4xl font-bold tracking-tight text-white">History</h1>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Archived executions and performance audit.</p>
+           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={exportToJSON} className="rounded-full border-white/5 bg-white/[0.02] text-slate-300 hover:text-white">
+          <Button variant="outline" onClick={exportToJSON} className="rounded-full border-white/[0.06] bg-white/[0.02] text-slate-300 hover:text-white px-6 h-11 transition-all hover:bg-white/[0.04]">
             <Download className="mr-2 h-4 w-4" />
-            Backup JSON
+            Backup
           </Button>
           <label className="cursor-pointer">
-            <div className="inline-flex items-center justify-center rounded-full border border-white/5 bg-white/[0.02] px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+            <div className="inline-flex items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.02] px-6 py-2.5 text-[13px] font-semibold text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
               <Upload className="mr-2 h-4 w-4" />
               Restore
             </div>
@@ -110,97 +115,97 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
           <Input 
-            placeholder="Search assets, strategies..." 
-            className="pl-10 bg-white/[0.02] border-white/5 rounded-xl h-11 focus:ring-primary/20"
+            placeholder="Search by asset or strategy..." 
+            className="pl-12 bg-white/[0.02] border-white/[0.06] rounded-2xl h-12 focus:ring-4 focus:ring-primary/5 focus:border-primary/40 transition-all font-medium"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button onClick={exportToCSV} variant="outline" className="rounded-xl border-white/5 bg-white/[0.02] text-slate-400 h-11">
+        <Button onClick={exportToCSV} variant="outline" className="rounded-2xl border-white/[0.06] bg-white/[0.02] text-slate-400 h-12 px-6 hover:text-white hover:bg-white/[0.04]">
           <FileText className="mr-2 h-4 w-4" />
           Export CSV
         </Button>
       </div>
 
-      <Card className="bg-white/[0.01] border-white/5 backdrop-blur-xl shadow-2xl overflow-hidden rounded-2xl">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-white/5 hover:bg-transparent">
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pl-8">Date</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Asset</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Side</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Size</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Entry</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Exit</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-slate-500">PNL</TableHead>
-              <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-slate-500 pr-8">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTrades.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="p-12 text-center text-slate-500 text-sm font-medium">
-                  No records found matching your search.
-                </TableCell>
+      <Card className="bg-white/[0.01] border-white/[0.06] backdrop-blur-xl shadow-2xl overflow-hidden rounded-3xl">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-white/[0.04] hover:bg-transparent bg-white/[0.01]">
+                <TableHead className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 pl-8 h-12">Date</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Asset</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Side</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Size</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Execution</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">PNL</TableHead>
+                <TableHead className="text-right text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 pr-8">Actions</TableHead>
               </TableRow>
-            ) : (
-              filteredTrades.map((trade) => (
-                <TableRow key={trade.id} className="border-white/5 group hover:bg-white/[0.02] transition-colors">
-                  <TableCell className="text-xs font-mono text-slate-400 pl-8">
-                    {new Date(trade.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-sm font-bold text-white">
-                    {trade.asset}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={cn(
-                      "px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter border-0",
-                      trade.side === "Long" 
-                        ? "bg-primary/10 text-primary" 
-                        : "bg-rose-500/10 text-rose-500"
-                    )}>
-                      {trade.side}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs font-mono text-slate-400">
-                    {trade.quantity}
-                  </TableCell>
-                  <TableCell className="text-xs font-mono text-slate-400">
-                    ${trade.entryPrice.toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-xs font-mono text-slate-400">
-                    {trade.exitPrice ? `$${trade.exitPrice.toFixed(2)}` : "—"}
-                  </TableCell>
-                  <TableCell className={cn(
-                    "text-sm font-bold font-mono",
-                    (trade.pnl || 0) >= 0 ? "text-primary" : "text-rose-500"
-                  )}>
-                    {(trade.pnl || 0) >= 0 ? "+" : "-"}${Math.abs(trade.pnl || 0).toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right pr-8">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => deleteTrade(trade.id)}
-                      className="text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {filteredTrades.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="p-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                       <Layers className="h-10 w-10 text-slate-700" />
+                       <p className="text-sm text-slate-500 font-medium">No archived executions found.</p>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                filteredTrades.map((trade) => (
+                  <TableRow key={trade.id} className="border-white/[0.04] group hover:bg-white/[0.02] transition-colors h-16">
+                    <TableCell className="text-[13px] font-mono text-slate-400 pl-8">
+                      {new Date(trade.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' })}
+                    </TableCell>
+                    <TableCell className="text-[14px] font-bold text-white tracking-tight">
+                      {trade.asset}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={cn(
+                        "px-3 py-1 text-[10px] font-bold uppercase tracking-widest border-0 rounded-lg",
+                        trade.side === "Long" 
+                          ? "bg-emerald-500/10 text-emerald-400" 
+                          : "bg-rose-500/10 text-rose-500"
+                      )}>
+                        {trade.side}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-[13px] font-mono text-slate-400">
+                      {trade.quantity}
+                    </TableCell>
+                    <TableCell>
+                       <div className="flex flex-col">
+                          <span className="text-[13px] font-mono text-white">${trade.entryPrice.toFixed(2)}</span>
+                          <span className="text-[11px] font-mono text-slate-500">→ {trade.exitPrice ? `$${trade.exitPrice.toFixed(2)}` : "Open"}</span>
+                       </div>
+                    </TableCell>
+                    <TableCell className={cn(
+                      "text-[14px] font-bold font-mono tracking-tighter",
+                      (trade.pnl || 0) >= 0 ? "text-emerald-400" : "text-rose-500"
+                    )}>
+                      {(trade.pnl || 0) >= 0 ? "+" : "-"}${Math.abs(trade.pnl || 0).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right pr-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => deleteTrade(trade.id)}
+                        className="text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 transition-all rounded-xl opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }
