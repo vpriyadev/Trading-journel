@@ -108,12 +108,7 @@ export function AddTradeForm() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Add Trade</h1>
-        <p className="text-sm text-slate-400">Log a position to track and learn from</p>
-      </header>
-
+    <div className="w-full max-w-4xl space-y-10">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 glass-morphism rounded-[2rem] p-10">
           <div className="grid grid-cols-2 gap-x-12 gap-y-8">
